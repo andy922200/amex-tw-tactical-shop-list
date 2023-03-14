@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Amex TW 特約好店列表</title>
+        <meta content='maximum-scale=1.0, initial-scale=1.0, width=device-width' name='viewport'>
+        <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
+        <link href="https://unpkg.com/vue3-easy-data-table/dist/style.css" rel="stylesheet">
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body>
+        <div id="app">
+            <nav class="custom-navbar navbar navbar-light" style="background-color: #e3f2fd;">
+                <h2>
+                    <a href="https://www.amexcards.com.tw/benefit/tactical/index.aspx?type=14" target="_blank">
+                        Amex TW 特約好店列表
+                    </a>
+                </h2>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" v-model="searchValue" placeholder="請輸入關鍵字">
+                </form>
+            </nav>
+            <div class="container-fluid">
+                <p class="update-time">資料更新時間：{{ updateTime }}</p>
+                <div class="table-wrapper">
+                    <easy-data-table
+                        table-class-name="list-table"
+                        :headers="headers"
+                        :items="items"
+                        :search-field="['category','name']"
+                        :search-value="searchValue"
+                    />
+                </div>
+                <div class="footer">
+                    <p class="footer__copyright"> © {{currentYear}} SMLPoints.com || All Rights Reserved. </p>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/vue@3.2.1/dist/vue.global.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
+        <script src="https://unpkg.com/vue3-easy-data-table"></script>
+        <script>
+            const { createApp, ref, onMounted } = Vue;
+
+            const App = {
+                components: { 
+                    EasyDataTable: window["vue3-easy-data-table"] 
+                },
+                setup() {
+                    const headers = ref([
+                        { text: "編號", value: "id"},
+                        { text: "類別", value: "category", sortable: true},
+                        { text: "名稱", value: "name", sortable: true}
+                    ]);
+                    const items = ref([])
+                    const currentYear = dayjs().year()
+                    const updateTime = dayjs('2023-03-14').format('YYYY/MM/DD')
+                    const searchValue = ref('')
+
+                    onMounted(async()=>{
+                        const { data }= await axios.get('amex-tw-shop-list.json')
+
+                        items.value = data
+                    })
+
+                    return {
+                        headers,
+                        items,
+                        currentYear,
+                        searchValue,
+                        updateTime
+                    }
+                }
+            }
+            createApp(App).mount("#app")
+        </script>
+    </body>
+</html>
+
+
+
+
